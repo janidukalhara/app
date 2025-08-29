@@ -6,6 +6,7 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
 import { useToast } from '../hooks/use-toast';
+import { contactService } from '../services/api';
 import { personalInfo } from '../data/mock';
 
 const Contact = () => {
@@ -30,19 +31,19 @@ const Contact = () => {
     setIsSubmitting(true);
     
     try {
-      // Simulate form submission - In real app, this would hit your backend API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await contactService.submitContactForm(formData);
       
       toast({
         title: "Message Sent Successfully! 🎉",
-        description: "Thank you for reaching out. I'll get back to you soon!",
+        description: response.message || "Thank you for reaching out. I'll get back to you soon!",
       });
       
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
+      console.error('Contact form error:', error);
       toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
+        title: "Error Sending Message",
+        description: error.message || "Failed to send message. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -96,7 +97,7 @@ const Contact = () => {
   ];
 
   return (
-    <section id="contact" className="py-20 bg-gray-900">
+    <section id="contact" className="py-20 bg-gray-900/80 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -110,7 +111,7 @@ const Contact = () => {
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Contact Information */}
           <div className="lg:col-span-1">
-            <Card className="bg-gray-800 border-gray-700 mb-8">
+            <Card className="bg-gray-800/80 border-gray-700 mb-8 backdrop-blur-sm">
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold text-white mb-6 flex items-center">
                   <MessageSquare className="w-5 h-5 mr-2 text-blue-400" />
@@ -120,7 +121,7 @@ const Contact = () => {
                 <div className="space-y-6">
                   {contactMethods.map((method, index) => (
                     <div key={index} className="flex items-start space-x-4">
-                      <div className="flex-shrink-0 p-2 bg-gray-700 rounded-lg">
+                      <div className="flex-shrink-0 p-2 bg-gray-700/50 rounded-lg backdrop-blur-sm">
                         {method.icon}
                       </div>
                       <div>
@@ -140,7 +141,7 @@ const Contact = () => {
             </Card>
 
             {/* Social Links */}
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-gray-800/80 border-gray-700 backdrop-blur-sm">
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Follow Me</h3>
                 <div className="flex space-x-4">
@@ -150,7 +151,7 @@ const Contact = () => {
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`p-3 bg-gray-700 rounded-lg text-gray-300 transition-all duration-300 hover:bg-gray-600 transform hover:scale-105 ${social.color}`}
+                      className={`p-3 bg-gray-700/50 rounded-lg text-gray-300 transition-all duration-300 hover:bg-gray-600/50 transform hover:scale-105 backdrop-blur-sm ${social.color}`}
                       title={social.name}
                     >
                       {social.icon}
@@ -163,7 +164,7 @@ const Contact = () => {
 
           {/* Contact Form */}
           <div className="lg:col-span-2">
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-gray-800/80 border-gray-700 backdrop-blur-sm">
               <CardContent className="p-8">
                 <h3 className="text-2xl font-semibold text-white mb-6">Send a Message</h3>
                 
@@ -178,7 +179,8 @@ const Contact = () => {
                         value={formData.name}
                         onChange={handleChange}
                         required
-                        className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500"
+                        disabled={isSubmitting}
+                        className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 backdrop-blur-sm"
                         placeholder="John Doe"
                       />
                     </div>
@@ -192,7 +194,8 @@ const Contact = () => {
                         value={formData.email}
                         onChange={handleChange}
                         required
-                        className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500"
+                        disabled={isSubmitting}
+                        className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 backdrop-blur-sm"
                         placeholder="john@example.com"
                       />
                     </div>
@@ -207,7 +210,8 @@ const Contact = () => {
                       value={formData.subject}
                       onChange={handleChange}
                       required
-                      className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500"
+                      disabled={isSubmitting}
+                      className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 backdrop-blur-sm"
                       placeholder="Project Discussion / Job Opportunity / Consultation"
                     />
                   </div>
@@ -220,8 +224,9 @@ const Contact = () => {
                       value={formData.message}
                       onChange={handleChange}
                       required
+                      disabled={isSubmitting}
                       rows={6}
-                      className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 resize-none"
+                      className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500 resize-none backdrop-blur-sm"
                       placeholder="Tell me about your project, requirements, or what you'd like to discuss..."
                     />
                   </div>
@@ -229,12 +234,12 @@ const Contact = () => {
                   <Button 
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed py-3 text-lg font-medium"
+                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed py-3 text-lg font-medium transition-all duration-300 transform hover:scale-105"
                   >
                     {isSubmitting ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                        Sending...
+                        Sending Message...
                       </>
                     ) : (
                       <>
@@ -251,7 +256,7 @@ const Contact = () => {
 
         {/* Quick Response Promise */}
         <div className="mt-16 text-center">
-          <Card className="bg-gradient-to-r from-blue-900/30 via-purple-900/30 to-green-900/30 border-blue-500/30">
+          <Card className="bg-gradient-to-r from-blue-900/30 via-purple-900/30 to-green-900/30 border-blue-500/30 backdrop-blur-sm">
             <CardContent className="p-8">
               <h3 className="text-xl font-bold text-white mb-4">Quick Response Guaranteed</h3>
               <p className="text-gray-300 max-w-2xl mx-auto">
