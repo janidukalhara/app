@@ -12,17 +12,13 @@ const Hero = () => {
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')]"></div>
-      </div>
-
+    <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      {/* Content with higher z-index to appear above 3D background */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center">
           {/* Profile Image */}
           <div className="mb-8">
-            <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-blue-500/30 shadow-2xl">
+            <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-blue-500/30 shadow-2xl backdrop-blur-sm bg-black/20">
               <img 
                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face&cs=tinysrgb"
                 alt="Janidu Kalhara Perera"
@@ -32,15 +28,15 @@ const Hero = () => {
           </div>
 
           {/* Name and Title */}
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tight drop-shadow-lg">
             {personalInfo.name}
           </h1>
-          <p className="text-xl md:text-2xl text-blue-400 mb-6 font-light">
+          <p className="text-xl md:text-2xl text-blue-400 mb-6 font-light drop-shadow-md">
             {personalInfo.title}
           </p>
           
           {/* Bio */}
-          <p className="text-lg text-gray-300 max-w-3xl mx-auto mb-8 leading-relaxed">
+          <p className="text-lg text-gray-300 max-w-3xl mx-auto mb-8 leading-relaxed backdrop-blur-sm bg-black/20 p-6 rounded-lg border border-white/10">
             {personalInfo.bio}
           </p>
 
@@ -48,7 +44,7 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button 
               onClick={scrollToAbout}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-medium transition-all duration-300 transform hover:scale-105"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25"
             >
               Explore My Work
               <ArrowDown className="ml-2 w-5 h-5" />
@@ -56,7 +52,7 @@ const Hero = () => {
             
             <Button 
               variant="outline" 
-              className="border-blue-500 text-blue-400 hover:bg-blue-600 hover:text-white px-8 py-3 text-lg font-medium transition-all duration-300"
+              className="border-blue-500 text-blue-400 hover:bg-blue-600 hover:text-white px-8 py-3 text-lg font-medium transition-all duration-300 backdrop-blur-sm bg-black/20 border-2 shadow-lg"
             >
               Download CV
               <Download className="ml-2 w-5 h-5" />
@@ -65,7 +61,7 @@ const Hero = () => {
             <Button 
               variant="ghost" 
               onClick={() => window.open(personalInfo.currentPortfolio, '_blank')}
-              className="text-gray-300 hover:text-white hover:bg-gray-800 px-8 py-3 text-lg font-medium transition-all duration-300"
+              className="text-gray-300 hover:text-white hover:bg-gray-800/50 px-8 py-3 text-lg font-medium transition-all duration-300 backdrop-blur-sm"
             >
               Current Portfolio
               <ExternalLink className="ml-2 w-5 h-5" />
@@ -73,17 +69,17 @@ const Hero = () => {
           </div>
 
           {/* Location */}
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 text-sm backdrop-blur-sm bg-black/20 inline-block px-4 py-2 rounded-full">
             📍 {personalInfo.location}
           </p>
         </div>
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
         <button 
           onClick={scrollToAbout}
-          className="animate-bounce text-gray-400 hover:text-white transition-colors duration-200"
+          className="animate-bounce text-gray-400 hover:text-white transition-colors duration-200 backdrop-blur-sm bg-black/20 p-3 rounded-full"
         >
           <ArrowDown className="w-6 h-6" />
         </button>
