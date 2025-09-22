@@ -10,8 +10,6 @@ const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [useMockData, setUseMockData] = useState(false);
 
   useEffect(() => {
     loadProjects();
@@ -20,31 +18,21 @@ const Projects = () => {
   const loadProjects = async () => {
     setLoading(true);
     try {
-      const projectData = await projectService.getProjects({ 
-        category: activeCategory 
-      });
-      
+      const projectData = await projectService.getProjects({ category: activeCategory });
+
       if (projectData && projectData.length > 0) {
         setProjects(projectData);
-        setUseMockData(false);
       } else {
-        // Fallback to mock data if no projects in database
-        const filteredMockProjects = activeCategory === 'All' 
-          ? mockProjects 
+        const filteredMockProjects = activeCategory === 'All'
+          ? mockProjects
           : mockProjects.filter(project => project.category === activeCategory);
         setProjects(filteredMockProjects);
-        setUseMockData(true);
-        console.log('Using mock project data - no projects found in database');
       }
-    } catch (err) {
-      console.error('Failed to load projects:', err);
-      // Fallback to mock data on error
-      const filteredMockProjects = activeCategory === 'All' 
-        ? mockProjects 
+    } catch {
+      const filteredMockProjects = activeCategory === 'All'
+        ? mockProjects
         : mockProjects.filter(project => project.category === activeCategory);
       setProjects(filteredMockProjects);
-      setUseMockData(true);
-      setError('Using offline data - backend unavailable');
     } finally {
       setLoading(false);
     }
@@ -62,16 +50,6 @@ const Projects = () => {
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             A showcase of my work in full-stack development and business solutions
           </p>
-          {error && (
-            <div className="mt-4 p-3 bg-yellow-900/30 border border-yellow-500/50 rounded-lg">
-              <p className="text-yellow-400 text-sm">{error}</p>
-            </div>
-          )}
-          {useMockData && (
-            <div className="mt-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
-              <p className="text-blue-400 text-sm">🚀 Sample projects - Connect to database for live portfolio</p>
-            </div>
-          )}
         </div>
 
         {/* Category Filter */}

@@ -36,7 +36,7 @@ const Footer = () => {
                 Janidu Kalhara Perera
               </h3>
               <p className="text-blue-400 font-medium mb-4">
-                Software Engineer & Business Analyst
+                Software Engineer & Full-Stack Developer
               </p>
             </div>
             
@@ -149,16 +149,6 @@ const Footer = () => {
               Back to top
               <ArrowUp className="w-4 h-4 ml-2 group-hover:-translate-y-1 transition-transform duration-300" />
             </Button>
-          </div>
-        </div>
-
-        {/* Additional Info */}
-        <div className="py-4 border-t border-gray-800">
-          <div className="text-center">
-            <p className="text-xs text-gray-500">
-              This portfolio is built with React, Tailwind CSS, and shadcn/ui. 
-              Hosted with modern web technologies for optimal performance.
-            </p>
           </div>
         </div>
       </div>

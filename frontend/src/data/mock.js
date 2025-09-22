@@ -2,7 +2,7 @@
 
 export const personalInfo = {
   name: "Janidu Kalhara Perera",
-  title: "Software Engineer & Business Analyst",
+  title: "Software Engineer &  Full-Stack Developer",
   location: "Mount Lavinia, Sri Lanka",
   email: "janidukalhara999@gmail.com",
   phone: "0770196899",
@@ -116,7 +116,7 @@ export const testimonials = [
     position: "Project Manager",
     company: "Tech Solutions Inc.",
     content: "Janidu's technical expertise combined with his business analysis skills made him invaluable to our team. His ability to bridge the gap between technical requirements and business needs is exceptional.",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face&cs=tinysrgb"
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face&cs=tinysrgb"
   },
   {
     id: 2,

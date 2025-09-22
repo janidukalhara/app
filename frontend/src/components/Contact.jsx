@@ -26,30 +26,52 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    try {
-      const response = await contactService.submitContactForm(formData);
-      
-      toast({
-        title: "Message Sent Successfully! 🎉",
-        description: response.message || "Thank you for reaching out. I'll get back to you soon!",
-      });
-      
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    } catch (error) {
-      console.error('Contact form error:', error);
-      toast({
-        title: "Error Sending Message",
-        description: error.message || "Failed to send message. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+
+  try {
+    const response = await contactService.submitContactForm(formData);
+
+    // Ensure message is a string
+    let messageText = "";
+    if (response && response.message) {
+      messageText = typeof response.message === "string"
+        ? response.message
+        : JSON.stringify(response.message);
+    } else {
+      messageText = "Thank you for reaching out. I'll get back to you soon!";
     }
-  };
+
+    toast({
+      title: "Message Sent Successfully! 🎉",
+      description: messageText,
+    });
+
+    // Reset form
+    setFormData({ name: '', email: '', subject: '', message: '' });
+  } catch (error) {
+    console.error('Contact form error:', error);
+
+    // Extract error message safely
+    let errorMessage = "Failed to send message. Please try again.";
+    if (error?.response?.data?.message) {
+      errorMessage = error.response.data.message;
+    } else if (error?.message) {
+      errorMessage = error.message;
+    } else if (typeof error === "object") {
+      errorMessage = JSON.stringify(error);
+    }
+
+    toast({
+      title: "Error Sending Message",
+      description: errorMessage,
+      variant: "destructive"
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const contactMethods = [
     {

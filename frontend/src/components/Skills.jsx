@@ -9,8 +9,31 @@ const Skills = () => {
     "Backend Development": "⚙️",
     "UI/UX Design": "🎨",
     "Business Analysis": "📊",
-    "Database & Tools": "🔧"
+    "Database & Tools": "🔧",
+    "Other Tools": "🛠️"
   };
+ // Update skills: merge new backend skills into existing Backend Development
+  const updatedSkills = skills.map(skillGroup => {
+    if (skillGroup.category === "Backend Development") {
+      return {
+        ...skillGroup,
+        technologies: [...skillGroup.technologies.filter(t => t !== "MySQL"), "Python", "Node.js", "Express", "REST API"]
+      };
+    }
+    if (skillGroup.category === "Database & Tools") {
+      return {
+        ...skillGroup,
+        technologies: [...skillGroup.technologies, "MongoDB"]
+      };
+    }
+    return skillGroup;
+  });
+
+  // Add Other Tools
+  updatedSkills.push({
+    category: "Other Tools",
+    technologies: ["WordPress", "Postman"]
+  });
 
   return (
     <section id="skills" className="py-20 bg-black">
@@ -25,7 +48,7 @@ const Skills = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {skills.map((skillGroup, index) => (
+          {updatedSkills.map((skillGroup, index) => (
             <Card key={index} className="bg-gray-900 border-gray-700 hover:border-blue-500/50 transition-all duration-300 group">
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
@@ -59,9 +82,13 @@ const Skills = () => {
               { skill: "JavaScript/React", level: 90 },
               { skill: "PHP/Laravel", level: 85 },
               { skill: "Python", level: 80 },
+              { skill: "Node.js/Express", level: 80 },
+              { skill: "REST API", level: 75 },
               { skill: "MySQL/Database Design", level: 85 },
+              { skill: "MongoDB", level: 80 },
               { skill: "UI/UX Design", level: 75 },
-              { skill: "Business Analysis", level: 80 }
+              { skill: "WordPress", level: 70 },
+              { skill: "Postman", level: 80 }
             ].map((item, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex justify-between text-sm">

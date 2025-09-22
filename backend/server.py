@@ -4,62 +4,116 @@ from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional
 from datetime import datetime
+from uuid import uuid4
 
 # Import models
 from models.contact import ContactSubmission, ContactSubmissionCreate, ContactSubmissionResponse
 from models.blog import BlogPost, BlogPostCreate, BlogPostUpdate, BlogPostsResponse, calculate_read_time
 from models.testimonial import Testimonial, TestimonialCreate, TestimonialResponse
 from models.project import Project, ProjectCreate, ProjectsResponse
+from pydantic import BaseModel, EmailStr
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+DB_NAME = os.getenv("DB_NAME", "portfolio")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
-# Create the main app
+# MongoDB client
+client = AsyncIOMotorClient(MONGO_URL)
+db = client[DB_NAME]
+
+# FastAPI app
 app = FastAPI(title="Janidu Portfolio API", version="1.0.0")
-
-# Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-# CORS middleware
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
-    allow_methods=["*"], 
+    allow_origins=[FRONTEND_URL],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
+# Logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Root endpoint
+# ---------------------
+# SMTP Email Function
+# ---------------------
+def send_contact_email(name: str, sender_email: str, subject: str, message: str):
+    receiver_email = os.getenv("EMAIL_TO")
+    smtp_user = os.getenv("EMAIL_USER")
+    smtp_password = os.getenv("EMAIL_PASSWORD")
+
+    if not all([receiver_email, smtp_user, smtp_password]):
+        raise Exception("Email environment variables not set")
+
+    msg = MIMEMultipart()
+    msg["From"] = smtp_user
+    msg["To"] = receiver_email
+    msg["Subject"] = f"Portfolio Contact Form: {subject}"
+
+    body = f"""
+New message from portfolio contact form:
+
+Name: {name}
+Email: {sender_email}
+Subject: {subject}
+Message: {message}
+"""
+    msg.attach(MIMEText(body, "plain"))
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(smtp_user, smtp_password)
+        server.send_message(msg)
+    logger.info(f"Email sent to {receiver_email} from {sender_email}")
+
+# ---------------------
+# Root & Health
+# ---------------------
 @api_router.get("/")
 async def root():
     return {"message": "Janidu Portfolio API", "status": "active"}
 
-# Contact endpoints
+# ---------------------
+# Contact Endpoints
+# ---------------------
 @api_router.post("/contact", response_model=ContactSubmissionResponse)
 async def submit_contact_form(contact_data: ContactSubmissionCreate):
-    """Submit contact form"""
     try:
         contact = ContactSubmission(**contact_data.dict())
         await db.contacts.insert_one(contact.dict())
-        
-        # TODO: Send email notification here
+
+        # Send email
+        try:
+            send_contact_email(
+                name=contact.name,
+                sender_email=contact.email,
+                subject=contact.subject or "No Subject",
+                message=contact.message
+            )
+        except Exception as e:
+            logger.error(f"Failed to send email: {str(e)}")
+            return ContactSubmissionResponse(
+                success=True,
+                message=f"Message saved but failed to send email: {str(e)}",
+                id=contact.id
+            )
+
         logger.info(f"New contact submission from {contact.email}")
-        
         return ContactSubmissionResponse(
             success=True,
             message="Thank you for your message! I'll get back to you soon.",
@@ -71,7 +125,6 @@ async def submit_contact_form(contact_data: ContactSubmissionCreate):
 
 @api_router.get("/contact")
 async def get_contact_submissions():
-    """Get all contact submissions (admin only - basic implementation)"""
     try:
         contacts = await db.contacts.find().sort("created_at", -1).to_list(100)
         return {"contacts": contacts}
@@ -79,80 +132,60 @@ async def get_contact_submissions():
         logger.error(f"Error fetching contacts: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch contacts")
 
-# Blog endpoints  
+# ---------------------
+# Blog Endpoints
+# ---------------------
 @api_router.get("/blog", response_model=BlogPostsResponse)
 async def get_blog_posts(
-    category: Optional[str] = Query(None, description="Filter by category"),
-    page: int = Query(1, ge=1, description="Page number"),
-    per_page: int = Query(10, ge=1, le=50, description="Posts per page")
+    category: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=50)
 ):
-    """Get published blog posts with optional filtering and pagination"""
     try:
         skip = (page - 1) * per_page
-        
-        # Build query
         query = {"published": True}
         if category:
             query["category"] = category
-            
-        # Get posts with pagination
         posts_cursor = db.blog_posts.find(query).sort("date", -1).skip(skip).limit(per_page)
         posts = await posts_cursor.to_list(per_page)
-        
-        # Get total count
         total = await db.blog_posts.count_documents(query)
-        
-        # Convert to BlogPost models
         blog_posts = [BlogPost(**post) for post in posts]
-        
-        return BlogPostsResponse(
-            posts=blog_posts,
-            total=total,
-            page=page,
-            per_page=per_page
-        )
+        return BlogPostsResponse(posts=blog_posts, total=total, page=page, per_page=per_page)
     except Exception as e:
         logger.error(f"Error fetching blog posts: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch blog posts")
 
 @api_router.get("/blog/{post_id}", response_model=BlogPost)
 async def get_blog_post(post_id: str):
-    """Get single blog post by ID"""
     try:
         post = await db.blog_posts.find_one({"id": post_id, "published": True})
         if not post:
             raise HTTPException(status_code=404, detail="Blog post not found")
-        
         return BlogPost(**post)
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error(f"Error fetching blog post {post_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch blog post")
 
 @api_router.post("/blog", response_model=BlogPost)
 async def create_blog_post(post_data: BlogPostCreate):
-    """Create new blog post (admin only - basic implementation)"""
     try:
         blog_post = BlogPost(**post_data.dict())
         blog_post.read_time = calculate_read_time(blog_post.content)
-        
         await db.blog_posts.insert_one(blog_post.dict())
         logger.info(f"Created blog post: {blog_post.title}")
-        
         return blog_post
     except Exception as e:
         logger.error(f"Error creating blog post: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create blog post")
 
-# Testimonials endpoints
+# ---------------------
+# Testimonials
+# ---------------------
 @api_router.get("/testimonials", response_model=TestimonialResponse)
 async def get_testimonials():
-    """Get approved testimonials"""
     try:
         testimonials = await db.testimonials.find({"approved": True}).sort("created_at", -1).to_list(100)
-        testimonial_objects = [Testimonial(**testimonial) for testimonial in testimonials]
-        
+        testimonial_objects = [Testimonial(**t) for t in testimonials]
         return TestimonialResponse(testimonials=testimonial_objects)
     except Exception as e:
         logger.error(f"Error fetching testimonials: {str(e)}")
@@ -160,35 +193,28 @@ async def get_testimonials():
 
 @api_router.post("/testimonials", response_model=Testimonial)
 async def submit_testimonial(testimonial_data: TestimonialCreate):
-    """Submit new testimonial for approval"""
     try:
         testimonial = Testimonial(**testimonial_data.dict())
         await db.testimonials.insert_one(testimonial.dict())
-        
         logger.info(f"New testimonial submitted by {testimonial.name}")
         return testimonial
     except Exception as e:
         logger.error(f"Error submitting testimonial: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to submit testimonial")
 
-# Projects endpoints
-@api_router.get("/projects", response_model=ProjectsResponse) 
-async def get_projects(
-    category: Optional[str] = Query(None, description="Filter by category"),
-    featured: Optional[bool] = Query(None, description="Filter by featured status")
-):
-    """Get projects with optional filtering"""
+# ---------------------
+# Projects
+# ---------------------
+@api_router.get("/projects", response_model=ProjectsResponse)
+async def get_projects(category: Optional[str] = None, featured: Optional[bool] = None):
     try:
-        # Build query
         query = {}
         if category and category != "All":
             query["category"] = category
         if featured is not None:
             query["featured"] = featured
-            
         projects = await db.projects.find(query).sort("created_at", -1).to_list(100)
-        project_objects = [Project(**project) for project in projects]
-        
+        project_objects = [Project(**p) for p in projects]
         return ProjectsResponse(projects=project_objects)
     except Exception as e:
         logger.error(f"Error fetching projects: {str(e)}")
@@ -196,18 +222,16 @@ async def get_projects(
 
 @api_router.post("/projects", response_model=Project)
 async def create_project(project_data: ProjectCreate):
-    """Create new project (admin only - basic implementation)"""
     try:
         project = Project(**project_data.dict())
         await db.projects.insert_one(project.dict())
-        
         logger.info(f"Created project: {project.title}")
         return project
     except Exception as e:
         logger.error(f"Error creating project: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create project")
 
-# Include the router in the main app
+# Include router
 app.include_router(api_router)
 
 @app.on_event("shutdown")

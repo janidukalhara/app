@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API = `${BACKEND_URL}/api`;
 
 // Create axios instance with default config
@@ -34,25 +34,32 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Contact Service
+const API_BASE = "http://localhost:8001/api"; // make sure this matches your backend
+
 export const contactService = {
-  async submitContactForm(contactData) {
+  submitContactForm: async (formData) => {
     try {
-      const response = await apiClient.post('/contact', contactData);
-      return response.data;
+      const response = await fetch(`${API_BASE}/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        // Try to parse error message from backend
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || "Failed to send message");
+      }
+
+      const data = await response.json();
+      return data; // this will contain { success, message, id }
     } catch (error) {
-      throw new Error(error.response?.data?.detail || 'Failed to send message');
+      console.error("ContactService Error:", error);
+      throw error; // will be caught in your handleSubmit
     }
   },
-
-  async getContactSubmissions() {
-    try {
-      const response = await apiClient.get('/contact');
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.detail || 'Failed to fetch contacts');
-    }
-  }
 };
 
 // Blog Service
@@ -160,5 +167,7 @@ export const healthService = {
     }
   }
 };
+
+
 
 export default apiClient;
