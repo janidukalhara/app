@@ -22,13 +22,18 @@ from pydantic import BaseModel, EmailStr
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://janidukalhara99_db_user:QGRFDV1cn9zoxVki@cluster0.rjhl6me.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+MONGO_URL = os.getenv("MONGO_URL")
 DB_NAME = os.getenv("DB_NAME", "portfolio")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://janiduperera.netlify.app/")
 
 # MongoDB client
-client = AsyncIOMotorClient(MONGO_URL)
-db = client[DB_NAME]
+try:
+    client = AsyncIOMotorClient(MONGO_URL)
+    db = client[DB_NAME]
+    print("MongoDB connected!")
+except Exception as e:
+    print("MongoDB connection failed:", str(e))
+
 
 # FastAPI app
 app = FastAPI(title="Janidu Portfolio API", version="1.0.0")
