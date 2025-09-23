@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://app-six-lyart.vercel.app';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API = `${BACKEND_URL}/api`;
 
 // Create axios instance with default config
@@ -34,7 +34,7 @@ apiClient.interceptors.response.use(
   }
 );
 
-const API_BASE = "https://app-six-lyart.vercel.app"; // make sure this matches your backend
+const API_BASE = "http://localhost:8001/api"; // make sure this matches your backend
 
 export const contactService = {
   submitContactForm: async (formData) => {
