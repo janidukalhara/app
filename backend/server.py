@@ -22,7 +22,7 @@ from pydantic import BaseModel, EmailStr
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://janidu:janidu&99@cluster0.hap8ffs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://janidukalhara99_db_user:QGRFDV1cn9zoxVki@cluster0.rjhl6me.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 DB_NAME = os.getenv("DB_NAME", "portfolio")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://janiduperera.netlify.app/")
 
