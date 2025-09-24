@@ -1,5 +1,5 @@
 // Mock data for Janidu Kalhara Perera's Portfolio
-
+<meta name="description" content="Professional portfolio of Janidu Kalhara Perera – Full-Stack Software Engineer & Business Analyst. Showcasing 3D React Three Fiber animations, FastAPI backend projects, and modern UX solutions." />
 export const personalInfo = {
   name: "Janidu Kalhara Perera",
   title: "Software Engineer &  Full-Stack Developer",

@@ -2,18 +2,58 @@ import React from 'react';
 import { ArrowDown, Download, ExternalLink } from 'lucide-react';
 import { Button } from './ui/button';
 import { personalInfo } from '../data/mock';
+import { Helmet } from 'react-helmet-async';
 
 const Hero = () => {
   const scrollToAbout = () => {
     const aboutSection = document.querySelector('#about');
-    if (aboutSection) {
-      aboutSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (aboutSection) aboutSection.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Content with higher z-index to appear above 3D background */}
+      <Helmet>
+        <title>{personalInfo.name} – {personalInfo.title}</title>
+        <meta name="description" content={personalInfo.bio} />
+        <meta name="author" content={personalInfo.name} />
+        <meta name="keywords" content="Full-Stack Developer, Software Engineer, Portfolio, React, FastAPI, Web Development" />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:title" content={`${personalInfo.name} – ${personalInfo.title}`} />
+        <meta property="og:description" content={personalInfo.bio} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={personalInfo.currentPortfolio} />
+        <meta property="og:image" content="/images/profile.jpg" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${personalInfo.name} – ${personalInfo.title}`} />
+        <meta name="twitter:description" content={personalInfo.bio} />
+        <meta name="twitter:image" content="/images/profile.jpg" />
+
+        {/* JSON-LD Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": personalInfo.name,
+            "url": personalInfo.currentPortfolio,
+            "image": "/images/profile.jpg",
+            "jobTitle": personalInfo.title,
+            "sameAs": [
+              personalInfo.github,
+              `https://${personalInfo.linkedin}`
+            ],
+            "description": personalInfo.bio,
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": personalInfo.location
+            }
+          })}
+        </script>
+      </Helmet>
+
+      {/* Content with higher z-index */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center">
           {/* Profile Image */}
@@ -21,7 +61,7 @@ const Hero = () => {
             <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-blue-500/30 shadow-2xl backdrop-blur-sm bg-black/20">
               <img 
                 src="/images/profile.jpg"
-                alt="Janidu Kalhara Perera"
+                alt={personalInfo.name}
                 className="w-full h-full object-cover"
               />
             </div>

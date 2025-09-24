@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Github, Linkedin, Mail } from 'lucide-react';
 import { personalInfo } from '../data/mock';
+import { Helmet } from 'react-helmet-async';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,9 +26,7 @@ const Header = () => {
 
   const scrollToSection = (href) => {
     const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
     setIsOpen(false);
   };
 
@@ -35,6 +34,29 @@ const Header = () => {
     <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${
       isScrolled ? 'bg-gray-900/95 backdrop-blur-sm border-b border-gray-800' : 'bg-transparent'
     }`}>
+      <Helmet>
+        <title>Janidu Kalhara Perera – Full-Stack Software Engineer & Business Analyst</title>
+        <meta
+          name="description"
+          content="Portfolio of Janidu Kalhara Perera – Full-Stack Software Engineer & Business Analyst. Explore projects, skills, and education in web development and software engineering."
+        />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": "Janidu Kalhara Perera",
+            "jobTitle": "Full-Stack Software Engineer & Business Analyst",
+            "url": personalInfo.currentPortfolio,
+            "sameAs": [
+              personalInfo.github,
+              `https://${personalInfo.linkedin}`
+            ],
+            "email": personalInfo.email,
+            "description": "Passionate about creating innovative digital solutions that bridge the gap between business needs and technical excellence."
+          })}
+        </script>
+      </Helmet>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}

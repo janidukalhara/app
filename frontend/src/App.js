@@ -12,6 +12,7 @@ import Blog from "./components/Blog";
 import Testimonials from "./components/Testimonials";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
+import SEO from "./components/SEO"; // ✅ Import SEO component
 
 // Loading component for 3D background
 const LoadingFallback = () => (
@@ -21,6 +22,24 @@ const LoadingFallback = () => (
 function App() {
   return (
     <div className="App min-h-screen text-white relative">
+       {/* ✅ SEO for Home page */}
+      <SEO
+        title="Janidu Kalhara Perera – Full-Stack Software Engineer & Business Analyst"
+        description="Professional portfolio of Janidu Kalhara Perera – showcasing React Three Fiber 3D animations, FastAPI backend projects, and modern UX solutions."
+        url="https://janiduperera.netlify.app/"
+        image="https://janiduperera.netlify.app/preview.jpg"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: "Janidu Kalhara Perera",
+          url: "https://janiduperera.netlify.app/",
+          sameAs: [
+            "https://github.com/janidukalhara",
+            "https://www.linkedin.com/in/janidu-perera"
+          ],
+          jobTitle: "Full-Stack Software Engineer & Business Analyst"
+        }}
+      />
       {/* 3D Background */}
       <Suspense fallback={<LoadingFallback />}>
         <ThreeDBackground />

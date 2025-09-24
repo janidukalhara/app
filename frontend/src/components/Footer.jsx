@@ -2,6 +2,7 @@ import React from 'react';
 import { Heart, Github, Linkedin, Mail, ArrowUp } from 'lucide-react';
 import { Button } from './ui/button';
 import { personalInfo } from '../data/mock';
+import { Helmet } from 'react-helmet-async';
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -26,6 +27,33 @@ const Footer = () => {
 
   return (
     <footer className="bg-black border-t border-gray-800">
+      <Helmet>
+        <title>Janidu Kalhara Perera – Full-Stack Software Engineer & Business Analyst</title>
+        <meta
+          name="description"
+          content="Professional portfolio of Janidu Kalhara Perera – Full-Stack Software Engineer & Business Analyst. Showcasing React, Three.js, FastAPI backend projects, and modern UX solutions."
+        />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": "Janidu Kalhara Perera",
+            "jobTitle": "Full-Stack Software Engineer & Business Analyst",
+            "url": personalInfo.currentPortfolio,
+            "sameAs": [
+              personalInfo.github,
+              `https://${personalInfo.linkedin}`
+            ],
+            "email": personalInfo.email,
+            "description": "Passionate about creating innovative digital solutions that bridge the gap between business needs and technical excellence.",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Sri Lanka"
+            }
+          })}
+        </script>
+      </Helmet>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="py-12 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -81,9 +109,7 @@ const Footer = () => {
                   <button 
                     onClick={() => {
                       const element = document.querySelector(link.href);
-                      if (element) {
-                        element.scrollIntoView({ behavior: 'smooth' });
-                      }
+                      if (element) element.scrollIntoView({ behavior: 'smooth' });
                     }}
                     className="text-gray-300 hover:text-blue-400 transition-colors duration-200 text-sm"
                   >
@@ -105,9 +131,7 @@ const Footer = () => {
                       onClick={() => {
                         if (resource.href === '#') return;
                         const element = document.querySelector(resource.href);
-                        if (element) {
-                          element.scrollIntoView({ behavior: 'smooth' });
-                        }
+                        if (element) element.scrollIntoView({ behavior: 'smooth' });
                       }}
                       className="text-gray-300 hover:text-blue-400 transition-colors duration-200 text-sm"
                     >

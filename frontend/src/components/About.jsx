@@ -2,6 +2,7 @@ import React from 'react';
 import { Code, Users, TrendingUp, Award } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { personalInfo } from '../data/mock';
+import { Helmet } from 'react-helmet-async';
 
 const About = () => {
   const highlights = [
@@ -29,6 +30,32 @@ const About = () => {
 
   return (
     <section id="about" className="py-20 bg-gray-900">
+      <Helmet>
+        <title>About Me – Janidu Kalhara Perera | Full-Stack Developer & Business Analyst</title>
+        <meta
+          name="description"
+          content="Learn more about Janidu Kalhara Perera, a Full-Stack Developer and Business Analyst with expertise in React, FastAPI, Python, Laravel, and data-driven solutions."
+        />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": personalInfo.name,
+            "url": personalInfo.website,
+            "image": personalInfo.profileImage,
+            "sameAs": personalInfo.socials, 
+            "jobTitle": "Full-Stack Developer & Business Analyst",
+            "worksFor": {
+              "@type": "Organization",
+              "name": personalInfo.company || "Freelance"
+            },
+            "description": "Proactive Software Engineer and Business Analyst proficient in React, FastAPI, Python, Laravel, and data-driven solutions.",
+            "alumniOf": personalInfo.education || "Computer Science Studies",
+            "knowsAbout": ["Web Development", "Business Analysis", "AI", "Big Data", "Process Automation"]
+          })}
+        </script>
+      </Helmet>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">

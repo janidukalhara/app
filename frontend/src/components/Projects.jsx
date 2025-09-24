@@ -5,6 +5,7 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { projectService } from '../services/api';
 import { projects as mockProjects, projectCategories } from '../data/mock';
+import { Helmet } from 'react-helmet-async';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -42,6 +43,30 @@ const Projects = () => {
 
   return (
     <section id="projects" className="py-20 bg-gray-900/80 backdrop-blur-sm">
+      <Helmet>
+        <title>Portfolio Projects – Janidu Kalhara Perera | React, FastAPI & 3D Web Work</title>
+        <meta
+          name="description"
+          content="Explore Janidu Kalhara Perera’s portfolio projects built with React, FastAPI, and MongoDB. Featuring 3D animations, responsive design, and real database integrations."
+        />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Portfolio Projects",
+            "itemListElement": projects.map((project, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "url": project.live_url || project.liveUrl,
+              "name": project.title,
+              "image": project.image,
+              "description": project.description,
+              "keywords": project.technologies.join(", ")
+            }))
+          })}
+        </script>
+      </Helmet>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">

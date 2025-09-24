@@ -3,6 +3,7 @@ import { GraduationCap, Calendar, MapPin, Award } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
 import { education } from '../data/mock';
+import { Helmet } from 'react-helmet-async';
 
 const Education = () => {
   const getStatusColor = (status) => {
@@ -36,6 +37,31 @@ const Education = () => {
 
   return (
     <section id="education" className="py-20 bg-black">
+      <Helmet>
+        <title>Education & Qualifications – Janidu Kalhara Perera</title>
+        <meta
+          name="description"
+          content="Explore the education, qualifications, and academic achievements of Janidu Kalhara Perera, a Full-Stack Developer and aspiring Business Analyst."
+        />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "EducationalOccupationalCredential",
+            "name": "Janidu Kalhara Perera Education Profile",
+            "educationalLevel": "Higher Education and Professional Certifications",
+            "alumniOf": education.map(edu => ({
+              "@type": "EducationalOrganization",
+              "name": edu.institution,
+              "program": edu.degree,
+              "startDate": edu.period?.split(" - ")[0] || null,
+              "endDate": edu.period?.split(" - ")[1] || null,
+              "credentialStatus": edu.status
+            })),
+            "description": "Detailed education background, academic achievements, and ongoing learning of Janidu Kalhara Perera."
+          })}
+        </script>
+      </Helmet>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -48,18 +74,13 @@ const Education = () => {
 
         {/* Education Timeline */}
         <div className="relative">
-          {/* Timeline Line */}
           <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-green-500"></div>
-
           <div className="space-y-8">
             {education.map((edu, index) => (
               <div key={index} className="relative flex items-start">
-                {/* Timeline Dot */}
                 <div className="flex-shrink-0 w-16 h-16 bg-gray-900 border-4 border-blue-500 rounded-full flex items-center justify-center z-10">
                   <GraduationCap className="w-6 h-6 text-blue-400" />
                 </div>
-
-                {/* Education Card */}
                 <Card className="flex-1 ml-8 bg-gray-900 border-gray-700 hover:border-blue-500/50 transition-all duration-300 group">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
@@ -76,7 +97,6 @@ const Education = () => {
                           {edu.period}
                         </div>
                       </div>
-                      
                       <div className="mt-3 md:mt-0">
                         <Badge className={getStatusColor(edu.status)}>
                           {edu.status}
@@ -84,7 +104,6 @@ const Education = () => {
                       </div>
                     </div>
 
-                    {/* Progress Bar for Ongoing Education */}
                     {edu.status === 'Ongoing' && (
                       <div className="mt-4">
                         <div className="flex justify-between text-sm text-gray-400 mb-2">
@@ -103,30 +122,25 @@ const Education = () => {
           </div>
         </div>
 
-        {/* Academic Achievements Section */}
+        {/* Academic Achievements */}
         <div className="mt-16">
           <h3 className="text-2xl font-bold text-white text-center mb-12">Academic Achievements</h3>
-          
           <div className="grid md:grid-cols-3 gap-6">
             {achievements.map((achievement, index) => (
               <Card key={index} className="bg-gray-900 border-gray-700 hover:border-yellow-500/50 transition-all duration-300 group">
                 <CardContent className="p-6 text-center">
-                  <div className="mb-4 flex justify-center">
-                    {achievement.icon}
-                  </div>
+                  <div className="mb-4 flex justify-center">{achievement.icon}</div>
                   <h4 className="text-lg font-semibold text-white mb-3 group-hover:text-yellow-400 transition-colors duration-300">
                     {achievement.title}
                   </h4>
-                  <p className="text-gray-300 text-sm leading-relaxed">
-                    {achievement.description}
-                  </p>
+                  <p className="text-gray-300 text-sm leading-relaxed">{achievement.description}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
 
-        {/* Current Focus */}
+        {/* Current Academic Focus */}
         <div className="mt-16 text-center">
           <Card className="bg-gradient-to-r from-blue-900/30 via-purple-900/30 to-green-900/30 border-blue-500/30">
             <CardContent className="p-8">
